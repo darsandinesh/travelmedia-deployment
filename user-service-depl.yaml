@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travelmedia-user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: travelmedia-user-service
+  template:
+    metadata:
+      labels:
+        app: travelmedia-user-service
+    spec:
+      containers:
+        - name: travelmedia-user-service
+          image: darsandinesh/travelmedia-user-service:latest
+          ports:
+            - containerPort: 40041
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: USER_PORT
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: USER_DB_URI
+            - name: SMTP_MAIL
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: SMTP_MAIL
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: SMTP_PASSWORD
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: RABBITMQ_URL
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: S3_ACCESS_KEY
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: S3_SECRET_ACCESS_KEY
+            - name: S3_BUCKETNAME
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: S3_BUCKETNAME
+            - name: S3_BUCKET_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: S3_BUCKET_REGION
+            - name: STRIPE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: travelmedia-secrets
+                  key: STRIPE_KEY
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: travelmedia-user-service
+spec:
+  type: ClusterIP
+  selector:
+    app: travelmedia-user-service
+  ports:
+    - protocol: TCP
+      port: 40041
+      targetPort: 40041
